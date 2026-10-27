@@ -1,0 +1,34 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Sachsen Pegel",
+        "description": "Base URL of the Sachsen Pegel proxy. The default works for the public instance.",
+        "data": {
+          "base_url": "Base URL"
+        }
+      },
+      "station": {
+        "title": "Select gauge station",
+        "data": {
+          "station_id": "Gauge station"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Failed to connect to the proxy.",
+      "no_stations": "The proxy returned no gauge stations."
+    },
+    "abort": {
+      "already_configured": "This gauge station is already configured."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "water_level": { "name": "Water level" },
+      "flow": { "name": "Flow rate" },
+      "flood_alert_level": { "name": "Flood alert level" },
+      "last_measurement": { "name": "Last measurement" }
+    }
+  }
+}

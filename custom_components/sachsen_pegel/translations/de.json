@@ -1,0 +1,34 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Sachsen Pegel",
+        "description": "Basis-URL des Sachsen-Pegel-Proxys. Der Standardwert passt für die öffentliche Instanz.",
+        "data": {
+          "base_url": "Basis-URL"
+        }
+      },
+      "station": {
+        "title": "Pegelstation wählen",
+        "data": {
+          "station_id": "Pegelstation"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Verbindung zum Proxy fehlgeschlagen.",
+      "no_stations": "Der Proxy hat keine Pegelstationen geliefert."
+    },
+    "abort": {
+      "already_configured": "Diese Pegelstation ist bereits eingerichtet."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "water_level": { "name": "Wasserstand" },
+      "flow": { "name": "Durchfluss" },
+      "flood_alert_level": { "name": "Meldestufe" },
+      "last_measurement": { "name": "Letzte Messung" }
+    }
+  }
+}
