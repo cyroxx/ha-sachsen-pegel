@@ -11,7 +11,7 @@ Custom integration for Home Assistant that provides water levels of the Saxon ga
 | Flood alert level | – | Text, passed through from the source in German (e.g. "Kein Hochwasser"); not translated |
 | Last measurement | – | Timestamp of the latest measurement |
 
-Values are fetched every 15 minutes. If a value is missing in the source, the sensor is `unknown`.
+Values are fetched every 5 minutes. If a value is missing in the source, the sensor is `unknown`.
 
 ## Installation
 
