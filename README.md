@@ -1,5 +1,8 @@
 # Sachsen Pegel for Home Assistant
 
+[![Validate](https://github.com/cyroxx/ha-sachsen-pegel/actions/workflows/validate.yml/badge.svg)](https://github.com/cyroxx/ha-sachsen-pegel/actions/workflows/validate.yml)
+[![Validate with hassfest](https://github.com/cyroxx/ha-sachsen-pegel/actions/workflows/hassfest.yml/badge.svg)](https://github.com/cyroxx/ha-sachsen-pegel/actions/workflows/hassfest.yml)
+
 Custom integration for Home Assistant that provides water levels of the Saxon gauge stations (HWIMS) via the [Sachsen Pegel Proxy](https://sachsen-pegel-proxy.vercel.app).
 
 ## Sensors per station

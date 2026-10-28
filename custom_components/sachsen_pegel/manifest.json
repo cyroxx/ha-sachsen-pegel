@@ -1,7 +1,7 @@
 {
   "domain": "sachsen_pegel",
   "name": "Sachsen Pegel",
-  "codeowners": [],
+  "codeowners": ["@cyroxx"],
   "config_flow": true,
   "documentation": "https://github.com/cyroxx/ha-sachsen-pegel",
   "issue_tracker": "https://github.com/cyroxx/ha-sachsen-pegel/issues",
