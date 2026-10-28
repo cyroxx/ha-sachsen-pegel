@@ -28,6 +28,7 @@
       "water_level": { "name": "Wasserstand" },
       "flow": { "name": "Durchfluss" },
       "flood_alert_level": { "name": "Meldestufe" },
+      "alarm_level": { "name": "Alarmstufe" },
       "last_measurement": { "name": "Letzte Messung" }
     }
   }

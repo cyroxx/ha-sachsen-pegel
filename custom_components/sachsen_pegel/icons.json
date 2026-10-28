@@ -1,7 +1,8 @@
 {
   "entity": {
     "sensor": {
-      "water_level": { "default": "mdi:arrow-expand-vertical" }
+      "water_level": { "default": "mdi:arrow-expand-vertical" },
+      "alarm_level": { "default": "mdi:water-alert-outline" }
     }
   }
 }

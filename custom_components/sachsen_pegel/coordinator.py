@@ -45,4 +45,8 @@ class PegelCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         latest = payload.get("latest")
         if not isinstance(latest, dict):
             raise UpdateFailed("Response contains no reading (latest)")
-        return {"station_title": payload.get("station_title"), **latest}
+        return {
+            "station_title": payload.get("station_title"),
+            "alarm_thresholds": payload.get("alarm_thresholds"),
+            **latest,
+        }

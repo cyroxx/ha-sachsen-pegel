@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime
@@ -26,11 +27,43 @@ from .coordinator import PegelCoordinator
 @dataclass(frozen=True, kw_only=True)
 class PegelSensorDescription(SensorEntityDescription):
     value_fn: Callable[[dict[str, Any]], Any]
+    attributes_fn: Callable[[dict[str, Any]], dict[str, Any]] | None = None
 
 
 def _timestamp(data: dict[str, Any]) -> datetime | None:
     raw = data.get("timestamp")
     return dt_util.parse_datetime(raw) if raw else None
+
+
+_ALARM_LEVEL_PATTERN = re.compile(r"Alarmstufe\s*(\d)$")
+
+# "Kein Hochwassermeldepegel" bedeutet, dass der Pegel nicht für amtliche
+# Hochwassermeldungen genutzt wird; dafür gibt es keine Alarmstufe, daher None.
+_NO_ALERT_TEXTS = {"Niedrigwasser", "Kein Hochwasser"}
+
+
+def _alarm_level(data: dict[str, Any]) -> int | None:
+    text = data.get("flood_alert_level")
+    if not isinstance(text, str):
+        return None
+    text = text.strip()
+    if text in _NO_ALERT_TEXTS:
+        return 0
+    match = _ALARM_LEVEL_PATTERN.match(text)
+    return int(match.group(1)) if match else None
+
+
+def _alarm_thresholds_attributes(data: dict[str, Any]) -> dict[str, Any]:
+    thresholds = data.get("alarm_thresholds")
+    if not isinstance(thresholds, list):
+        return {}
+    attributes = {}
+    for threshold in thresholds:
+        level = threshold.get("level")
+        water_level_cm = threshold.get("water_level_cm")
+        if isinstance(level, int) and isinstance(water_level_cm, int):
+            attributes[f"alarm_threshold_{level}_cm"] = water_level_cm
+    return attributes
 
 
 SENSORS: tuple[PegelSensorDescription, ...] = (
@@ -54,6 +87,13 @@ SENSORS: tuple[PegelSensorDescription, ...] = (
         key="flood_alert_level",
         translation_key="flood_alert_level",
         value_fn=lambda d: d.get("flood_alert_level"),
+    ),
+    PegelSensorDescription(
+        key="alarm_level",
+        translation_key="alarm_level",
+        state_class=SensorStateClass.MEASUREMENT,
+        value_fn=_alarm_level,
+        attributes_fn=_alarm_thresholds_attributes,
     ),
     PegelSensorDescription(
         key="last_measurement",
@@ -93,3 +133,9 @@ class PegelSensor(CoordinatorEntity[PegelCoordinator], SensorEntity):
     @property
     def native_value(self) -> Any:
         return self.entity_description.value_fn(self.coordinator.data)
+
+    @property
+    def extra_state_attributes(self) -> dict[str, Any] | None:
+        if self.entity_description.attributes_fn is None:
+            return None
+        return self.entity_description.attributes_fn(self.coordinator.data)

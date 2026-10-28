@@ -28,6 +28,7 @@
       "water_level": { "name": "Water level" },
       "flow": { "name": "Flow rate" },
       "flood_alert_level": { "name": "Flood alert level" },
+      "alarm_level": { "name": "Alarm level" },
       "last_measurement": { "name": "Last measurement" }
     }
   }

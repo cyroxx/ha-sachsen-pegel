@@ -1,0 +1,96 @@
+blueprint:
+  name: "Sachsen Pegel: Hochwasser-Alarm"
+  description: >
+    Benachrichtigt, wenn der Alarmstufen-Sensor einer "Sachsen Pegel"-Station
+    eine konfigurierbare Schwelle über- oder unterschreitet. Die Alarmstufe
+    (0 = kein Alarm, 1 bis 4) sowie die zugehörigen Richtwasserstände stammen
+    direkt aus der offiziellen HWIMS-Quelle über die Integration; es müssen
+    keine Pegel-spezifischen cm-Schwellen oder Helper-Entities mehr manuell
+    gepflegt werden.
+  domain: automation
+  source_url: https://github.com/cyroxx/ha-sachsen-pegel/blob/main/blueprints/automation/cyroxx/hochwasser-alarm.yaml
+  input:
+    alarm_level_entity:
+      name: Alarmstufen-Sensor
+      description: >
+        Der "Alarmstufe"-Sensor einer Sachsen-Pegel-Station (Entity der
+        Integration "Sachsen Pegel", Wert 0 bis 4).
+      selector:
+        entity:
+          integration: sachsen_pegel
+          domain: sensor
+    water_level_entity:
+      name: Wasserstand-Sensor (optional)
+      description: >
+        Der "Wasserstand"-Sensor derselben Station, nur für den Inhalt der
+        Benachrichtigung. Kann leer bleiben.
+      default: ""
+      selector:
+        entity:
+          integration: sachsen_pegel
+          domain: sensor
+    flow_entity:
+      name: Durchfluss-Sensor (optional)
+      description: >
+        Der "Durchfluss"-Sensor derselben Station, nur für den Inhalt der
+        Benachrichtigung. Kann leer bleiben.
+      default: ""
+      selector:
+        entity:
+          integration: sachsen_pegel
+          domain: sensor
+    threshold:
+      name: Alarmstufen-Schwelle
+      description: >
+        Alarmstufe, ab der benachrichtigt wird (1 bis 4). Es wird sowohl beim
+        Erreichen/Überschreiten als auch beim Abfallen unter diese Schwelle
+        benachrichtigt.
+      default: 1
+      selector:
+        number:
+          min: 1
+          max: 4
+          step: 1
+          mode: box
+    notify_target:
+      name: Benachrichtigungsdienst
+      description: Ziel für die Benachrichtigung (z. B. eine Mobile-App von Home Assistant).
+      selector:
+        entity:
+          domain: notify
+
+mode: queued
+max_exceeded: silent
+
+trigger:
+  - trigger: state
+    entity_id: !input alarm_level_entity
+
+variables:
+  threshold: !input threshold
+  water_level_entity: !input water_level_entity
+  flow_entity: !input flow_entity
+  station_name: "{{ device_attr(trigger.entity_id, 'name') or trigger.entity_id }}"
+  current_level: "{{ trigger.to_state.state | int(-1) }}"
+  previous_level: "{{ trigger.from_state.state | int(-1) if trigger.from_state else -1 }}"
+
+condition:
+  - condition: template
+    value_template: >
+      {{ current_level >= 0 and
+         ((current_level >= threshold and previous_level < threshold) or
+          (previous_level >= threshold and current_level < threshold)) }}
+
+action:
+  - action: notify.send_message
+    target:
+      entity_id: !input notify_target
+    data:
+      message: >
+        📍 {{ station_name }}
+
+        🚨 Alarmstufe: {{ current_level }} (vorher: {{ previous_level if previous_level >= 0 else "unbekannt" }})
+
+        {% if water_level_entity %}🚰 Wasserstand: {{ states(water_level_entity) }} cm
+        {% endif -%}
+        {% if flow_entity %}🌊 Durchfluss: {{ states(flow_entity) }} m³/s{% endif %}
